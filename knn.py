@@ -36,14 +36,19 @@ class ProjectKNN:
         self.data_test = self.data_test[int(0.9 * len(self.data_test)):]
 
     def declare_model(self):
-        params = {'n_neighbors': [1, 3, 5, 8, 13],
-                  'metric': ['euclidian', 'manhattan'],
-                  'weights': ['uniform', 'distance'],
-                  'leaf_size': [30, 33, 55, 88]
-                  }
-        knn = KNeighborsRegressor()
-        self.model = GridSearchCV(knn, params,
-                                  verbose=1, cv=3, n_jobs=-1)
+        # params = {'n_neighbors': [1, 3, 5, 8, 13],
+        #           'metric': ['euclidian', 'manhattan'],
+        #           'weights': ['uniform', 'distance'],
+        #           'leaf_size': [30, 33, 55, 88]
+        #           }
+        # knn = KNeighborsRegressor()
+        # self.model = GridSearchCV(knn, params,
+        #                           verbose=1, cv=3, n_jobs=-1)
+        self.model = KNeighborsRegressor(algorithm='auto', leaf_size=30,
+                                         metric='manhattan',
+                                         metric_params=None,
+                                         n_jobs=-1, n_neighbors=1,
+                                         p=2, weights='distance')
 
     def train(self):
         batch = self.data_train
@@ -53,8 +58,8 @@ class ProjectKNN:
             x for x in batch.columns if x in ('lat', 'lon')]].values
 
         self.model.fit(x_batch, y_batch)
-        self.model = knn.model.best_estimator_
-        print(self.model)
+        # self.model = knn.model.best_estimator_
+        # print(self.model)
 
     def test(self):
         x_batch = self.data_test[[
@@ -63,34 +68,62 @@ class ProjectKNN:
             x for x in self.data_test.columns if x in ('lat', 'lon')]].values
 
         out = self.model.predict(x_batch)
-        plt.plot([x[0] for x in y_batch], [x[1] for x in y_batch], 'o', label='Real')
-        plt.plot([x[0] for x in out], [x[1] for x in out], 'x', label='KNN')
-        plt.legend()
-        plt.set_title('Mapa de comparação')
-        plt.savefig('knn_map.png')
+        return out, y_batch
+
+    def result_analisys(self, out, y_batch):
+        fig, ax = plt.subplots()
+        ax.plot([x[0] for x in y_batch], [x[1]
+                                          for x in y_batch], 'o', label='Real')
+        ax.plot([x[0] for x in out], [x[1] for x in out], 'x', label='KNN')
+        ax.legend()
+        ax.set_title('Comparação')
+        fig.savefig('knn_map.png')
 
         error = y_batch - out
-        errors_x = error[:][0]
-        errors_y = error[:][1]
+        errors_x = error[:, 0]
+        errors_y = error[:, 1]
+
+        fig, ax = plt.subplots()
+        ax.boxplot(errors_x)
+        ax.set_title('BoxPlot Lat')
+        fig.savefig('knn_boxplot_lat.png')
+
+        fig, ax = plt.subplots()
+        ax.hist(errors_x)
+        ax.set_title('Histogram Lat')
+        fig.savefig('knn_hist_lat.png')
+
+        fig, ax = plt.subplots()
+        ax.boxplot(errors_y)
+        ax.set_title('BoxPlot Lon')
+        fig.savefig('knn_boxplot_lon.png')
+
+        fig, ax = plt.subplots()
+        ax.hist(errors_x)
+        ax.set_title('Histogram Lon')
+        fig.savefig('knn_hist_lon.png')
+
+        dists = []
+        for i in range(len(out)):
+            dists.append(np.linalg.norm(y_batch[i] - out[i]))
         
-        plt.clf()
-        plt.boxplot(errors_x)
-        plt.set_title('Box plot X')
-        plt.savefig('knn_boxplot_x.png')
+        fig, ax = plt.subplots()
+        ax.boxplot(dists)
+        ax.set_title('BoxPlot Dists')
+        fig.savefig('knn_boxplot_dists.png')
 
-        plt.clf()
-        plt.boxplot(errors_y)
-        plt.set_title('Box plot Y')
-        plt.savefig('knn_boxplot_y.png')
+        fig, ax = plt.subplots()
+        ax.hist(dists)
+        ax.set_title('Histogram Dists')
+        fig.savefig('knn_hist_dists.png')
 
-        errors_x = np.average(errors_x)
-        errors_y = np.average(errors_y)
 
-        return errors_x, errors_y
+        print(f'Erro Médio: {np.mean(dists)}\nErro Mínimo: {min(dists)}\n\
+Erro Máximo: {max(dists)}\nDesvio Padrão: {np.std(dists)}')
 
 
 if __name__ == "__main__":
     knn = ProjectKNN()
     knn.train()
     result = knn.test()
-    print(result)
+    knn.result_analisys(*result)
