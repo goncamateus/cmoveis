@@ -37,17 +37,15 @@ class ProjectXGBOOST:
         self.data_test = self.data_test[int(0.9 * len(self.data_test)):]
 
     def declare_model(self):
-        self.model_lat = xgboost.XGBRegressor(colsample_bytree=0.7,
-                 gamma=0,                 
+        self.model_lat = xgboost.XGBRegressor(gamma=0,                 
                  learning_rate=0.01,
-                 max_depth=7,
+                 max_depth=30,
                  n_estimators=100000,                                                      
                  objective='reg:squarederror',
                  n_jobs=-1)
-        self.model_lon = xgboost.XGBRegressor(colsample_bytree=0.7,
-                 gamma=0,                 
+        self.model_lon = xgboost.XGBRegressor(gamma=0,                 
                  learning_rate=0.01,
-                 max_depth=7,
+                 max_depth=30,
                  n_estimators=100000,                                                      
                  objective='reg:squarederror',
                  n_jobs=-1)
