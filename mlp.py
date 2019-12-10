@@ -17,7 +17,7 @@ class MLP(nn.Module):
             nn.ReLU(),
             nn.Linear(128, 256),
             nn.ReLU(),
-            nn.Linear(256, output_size),
+            nn.Linear(256, 1),
         )
 
     def forward(self, x):
@@ -55,52 +55,67 @@ class ProjectMLP:
         self.data_test = self.data_test[int(0.7 * len(self.data_test)):]
 
     def declare_model(self):
-        self.model = MLP(
+        self.model_x = MLP(
             self.X[0].shape[0], self.y[0].shape[0])
-        self.optimizer = optim.Adam(self.model.parameters(), lr=1e-3)
+        self.optimizer_x = optim.Adam(self.model_x.parameters(), lr=1e-3)
+        self.model_y = MLP(
+            self.X[0].shape[0], self.y[0].shape[0])
+        self.optimizer_y = optim.Adam(self.model_y.parameters(), lr=1e-3)
         self.loss_function = F.mse_loss
 
     def train(self, epochs=500):
         for epoch in range(epochs):
             for _ in range(100):
-                batch = self.data_train.sample(128)
+                batch = self.data_train.sample(512)
                 x_batch = batch[[
                     x for x in batch.columns if x not in ('lat', 'lon')]].values
-                y_batch = batch[[
-                    x for x in batch.columns if x in ('lat', 'lon')]].values
+                y_batch_x = batch[[
+                    x for x in batch.columns if x in ('lat')]].values
+                y_batch_y = batch[[
+                    x for x in batch.columns if x in ('lon')]].values
 
                 x_batch = torch.tensor(
                     x_batch).float()
-                y_batch = torch.tensor(
-                    y_batch).float()
+                y_batch_x = torch.tensor(
+                    y_batch_x).float()
+                y_batch_y = torch.tensor(
+                    y_batch_y).float()
 
-                out = self.model(x_batch)
-                loss = self.loss_function(out, y_batch)
-                self.optimizer.zero_grad()
-                loss.backward()
-                self.optimizer.step()
-                if abs(self.model_loss - loss.item()) < 0.1:
-                    if self.early_stop < 10:
-                        self.model_loss = loss.item()
-                        self.early_stop += 1
-                    else:
-                        break
-                else:
-                    self.model_loss = loss.item()
-                    self.early_stop = 0
+                out_x = self.model_x(x_batch)
+                out_y = self.model_y(x_batch)
+
+                loss_x = self.loss_function(out_x, y_batch_x)
+                self.optimizer_x.zero_grad()
+                loss_x.backward()
+                self.optimizer_x.step()
+
+                loss_y = self.loss_function(out_y, y_batch_y)
+                self.optimizer_y.zero_grad()
+                loss_y.backward()
+                self.optimizer_y.step()
 
     def test(self):
         x_batch = self.data_test[[
             x for x in self.data_test.columns if x not in ('lat', 'lon')]].values
-        y_batch = self.data_test[[
+        y_batch_x = self.data_test[[
+            x for x in self.data_test.columns if x in ('lat', 'lon')]].values
+        y_batch_y = self.data_test[[
             x for x in self.data_test.columns if x in ('lat', 'lon')]].values
 
         x_batch = torch.tensor(x_batch).float()
-        y_batch = torch.tensor(y_batch).float()
+        y_batch_x = torch.tensor(y_batch_x).float()
+        y_batch_y = torch.tensor(y_batch_y).float()
 
-        self.model.eval()
-        out = self.model(x_batch)
-        out = out.detach().numpy()
+
+        self.model_x.eval()
+        out_x = self.model_x(x_batch)
+        out_x = out_x.detach().numpy()
+
+        self.model_y.eval()
+        out_y = self.model_y(x_batch)
+        out_y = out_y.detach().numpy()
+
+        out = list(zip(out_x, out_y))
         return out, y_batch
     
 
