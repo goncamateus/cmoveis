@@ -21,16 +21,21 @@ class ProjectDataExploration:
         self.data = self.data.dropna()
 
     def analisys(self):   
-        
-        
         fig, ax = plt.subplots()
-        ax.boxplot(dists)
-        ax.set_title('BoxPlot Dists')
-        fig.savefig('xgboost_boxplot_dists.png')
+        ax.boxplot(self.data.lat)
+        ax.set_title('BoxPlot Latitude')
+        fig.savefig('boxplot_lat.png')
 
-        print(f'Erro Médio: {np.mean(dists)}\nErro Mínimo: {min(dists)}\n\
-Erro Máximo: {max(dists)}\nDesvio Padrão: {np.std(dists)}')
+        fig, ax = plt.subplots()
+        ax.boxplot(self.data.lon)
+        ax.set_title('BoxPlot Longitude')
+        fig.savefig('boxplot_lon.png')
 
+        print(f'Latitude Média: {np.mean(self.data.lat)}\nLatitude Mínima: {min(self.data.lat)}\n\
+Latitude Máxima: {max(self.data.lat)}\nDesvio Padrão Lat: {np.std(self.data.lat)}')
+        print()
+        print(f'Longitude Média: {np.mean(self.data.lon)}\nLongitude Mínima: {min(self.data.lon)}\n\
+Longitude Máxima: {max(self.data.lon)}\nDesvio Padrão Lon: {np.std(self.data.lon)}')
 
 if __name__ == "__main__":
     ProjectDataExploration()
