@@ -105,7 +105,11 @@ class ProjectKNN:
 
         dists = []
         for i in range(len(out)):
-            dists.append(np.linalg.norm(y_batch[i] - out[i]))
+            lat1, lon1 = y_batch[i]
+            lat2, lon2 = out[i]
+            dist = np.cos(lat1)*np.cos(lat2) + np.sin(lat1)*np.sin(lat2)*np.cos(lon1-lon2)
+            dist = 6371*np.arccos(dist)
+            dists.append(dist)
         
         fig, ax = plt.subplots()
         ax.boxplot(dists)
