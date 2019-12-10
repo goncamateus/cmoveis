@@ -85,7 +85,7 @@ class ProjectXGBOOST:
         fig, ax = plt.subplots()
         ax.plot([x[0] for x in y_batch], [x[1]
                                           for x in y_batch], 'o', label='Real')
-        ax.plot([x[0] for x in out], [x[1] for x in out], 'x', label='KNN')
+        ax.plot([x[0] for x in out], [x[1] for x in out], 'x', label='XGBoost')
         ax.legend()
         ax.set_title('Comparação')
         fig.savefig('xgboost_map.png')
