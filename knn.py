@@ -78,8 +78,6 @@ class ProjectKNN:
         out = self.model.predict(x_batch)
         df = pd.DataFrame()
         df['pontoId'] = test.pontoId
-        df['lat'] = y_batch[:, 0]
-        df['lon'] = y_batch[:, 1]
         df['lat_pred'] = out[:, 0]
         df['lon_pred'] = out[:, 1]
         df.to_csv('Resultados_Equipe3_Metodo_KNN.csv', index=False)

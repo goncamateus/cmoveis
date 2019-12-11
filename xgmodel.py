@@ -81,8 +81,6 @@ class ProjectXGBOOST:
 
         df = pd.DataFrame()
         df['pontoId'] = test.pontoId
-        df['lat'] = y_batch[:, 0]
-        df['lon'] = y_batch[:, 1]
         df['lat_pred'] = out_lat
         df['lon_pred'] = out_lon
         df.to_csv('Resultados_Equipe3_Metodo_XGBoost.csv', index=False)
