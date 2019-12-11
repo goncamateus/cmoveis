@@ -27,7 +27,6 @@ class ProjectXGBOOST:
         self.data = self.data.dropna()
 
     def split_data(self):
-        self.data = self.data.drop(columns=['pontoId'])
         self.X = self.data[[
             x for x in self.data.columns if x not in ('lat', 'lon')]].values
         self.y = self.data[[
