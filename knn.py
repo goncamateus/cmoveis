@@ -112,12 +112,12 @@ class ProjectKNN:
         
         fig, ax = plt.subplots()
         ax.boxplot(dists)
-        ax.set_title('BoxPlot Dists')
+        ax.set_title('KNN BoxPlot Dists')
         fig.savefig('knn_boxplot_dists.png')
 
         fig, ax = plt.subplots()
         ax.hist(dists)
-        ax.set_title('Histogram Dists')
+        ax.set_title('KNN Histogram Dists')
         fig.savefig('knn_hist_dists.png')
 
 

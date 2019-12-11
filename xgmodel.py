@@ -89,12 +89,12 @@ class ProjectXGBOOST:
         
         fig, ax = plt.subplots()
         ax.boxplot(dists)
-        ax.set_title('BoxPlot Dists')
+        ax.set_title('XGBoost BoxPlot Dists')
         fig.savefig('xgboost_boxplot_dists.png')
 
         fig, ax = plt.subplots()
         ax.hist(dists)
-        ax.set_title('Histogram Dists')
+        ax.set_title('XGBoost Histogram Dists')
         fig.savefig('xgboost_hist_dists.png')
 
 
