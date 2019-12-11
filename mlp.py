@@ -157,8 +157,8 @@ class ProjectMLP:
 
         df = pd.DataFrame()
         df['pontoId'] = test.pontoId
-        df['lat'] = y_batch_x
-        df['lon'] = y_batch_y
+        df['lat'] = y_batch_x.cpu().numpy()
+        df['lon'] = y_batch_y.cpu().numpy()
         df['lat_pred'] = out_x
         df['lon_pred'] = out_y
         df.to_csv('Resultados_Equipe3_Metodo_MLP.csv', index=False)
