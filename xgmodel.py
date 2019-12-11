@@ -16,7 +16,7 @@ class ProjectXGBOOST:
     model_loss = 10000
     early_stop = 0
 
-    def __init__(self, data_path='LocTreino_Equipe_3.csv', log_dir='log_mlp/'):
+    def __init__(self, data_path='LocTreino_Equipe_3.csv'):
         self.data = pd.read_csv(data_path)
         self.preproccess_data()
         self.split_data()
@@ -27,6 +27,7 @@ class ProjectXGBOOST:
         self.data = self.data.dropna()
 
     def split_data(self):
+        self.data = self.data.drop(columns=['pontoId'])
         self.X = self.data[[
             x for x in self.data.columns if x not in ('lat', 'lon')]].values
         self.y = self.data[[
